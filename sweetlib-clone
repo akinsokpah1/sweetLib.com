@@ -1,0 +1,317 @@
+OriginalHitz Clone — React + Tailwind (GitHub-ready)
+
+This single-file project scaffold provides a responsive, mobile-first React site that mirrors the layout and interactions in your screenshots: hero, trending cards grid, slide-out menu, floating WhatsApp button, and a small music streaming banner.
+
+It includes a GitHub Actions workflow to build and deploy to GitHub Pages automatically so all work (editing, branching, PRs, deployments) can be done inside GitHub.
+
+
+---
+
+What you get in this repo
+
+package.json — build & deploy scripts
+
+src/index.jsx — React entry
+
+src/App.jsx — the full single-file app UI (header, hero, trending grid, menu)
+
+src/styles.css — Tailwind + a few custom utilities
+
+public/index.html — base HTML
+
+.github/workflows/deploy.yml — GitHub Actions workflow to build & deploy to GitHub Pages on push to main
+
+README.md — this file
+
+
+
+---
+
+> Copy-paste the whole project into a new GitHub repo, commit to main, then GitHub Actions will build and publish to gh-pages branch and the Pages site.
+
+
+
+
+---
+
+Quick Start (GitHub-only flow)
+
+1. Create a new empty repository on GitHub (name: originalhitz-clone or whatever).
+
+
+2. On your machine clone it, or use GitHub web editor to create files. If using local machine:
+
+
+
+git clone git@github.com:YOURNAME/originalhitz-clone.git
+cd originalhitz-clone
+# copy files from this scaffold into the repo
+npm install
+npm run build
+# push
+git add .
+git commit -m "Initial scaffold"
+git push origin main
+
+3. After you push to main, open the Actions tab — the deploy.yml workflow will run and (on success) publish the site to GitHub Pages. The workflow deploys to the gh-pages branch.
+
+
+4. Visit https://<your-username>.github.io/<repo-name>/ (URL appears in the workflow run or repo Pages settings).
+
+
+5. Edit files directly in GitHub (web editor) or create branches/PRs; every push to main re-deploys.
+
+
+
+
+---
+
+Files
+
+package.json
+
+{
+  "name": "originalhitz-clone",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "deploy": "gh-pages -d dist"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.14",
+    "gh-pages": "^5.0.0",
+    "postcss": "^8.4.23",
+    "tailwindcss": "^3.4.8",
+    "vite": "^5.0.0"
+  }
+}
+
+
+---
+
+public/index.html
+
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OriginalHitz Clone</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/index.jsx"></script>
+  </body>
+</html>
+
+
+---
+
+src/index.jsx
+
+import React from 'react'
+import { createRoot } from 'react-dom/client'
+import App from './App'
+import './styles.css'
+
+createRoot(document.getElementById('root')).render(<App />)
+
+
+---
+
+src/App.jsx
+
+import React, { useState } from 'react'
+
+const Tag = ({ children }) => (
+  <span className="inline-block bg-white/90 text-blue-700 text-xs font-semibold px-3 py-1 rounded-md mr-2 shadow-sm">{children}</span>
+)
+
+const Card = ({ title, img }) => (
+  <div className="bg-white rounded shadow overflow-hidden">
+    <div className="relative h-40 md:h-44 bg-gray-200">
+      <img src={img} alt="cover" className="object-cover w-full h-full" />
+      <div className="absolute left-3 bottom-3">
+        <Tag>AFRO</Tag>
+        <Tag>AFRO POP</Tag>
+      </div>
+    </div>
+    <div className="p-4 bg-slate-800 text-white">
+      <h3 className="font-bold">{title}</h3>
+    </div>
+  </div>
+)
+
+export default function App() {
+  const [menuOpen, setMenuOpen] = useState(false)
+  const sampleCards = new Array(6).fill(0).map((_, i) => ({
+    title: `Song title ${i + 1} – Artist`,
+    img: `https://picsum.photos/seed/${i}/600/400`
+  }))
+
+  return (
+    <div className="min-h-screen bg-white text-slate-800">
+      {/* header */}
+      <header className="bg-red-600 text-white p-4 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <img src="/logo192.png" alt="logo" className="w-10 h-10 rounded" />
+          <div className="font-bold">OriginalHitz</div>
+        </div>
+        <div className="flex items-center gap-3">
+          <button className="md:hidden p-2" onClick={() => setMenuOpen(true)} aria-label="open menu">☰</button>
+          <button className="p-2 hidden md:block" aria-label="search">🔍</button>
+        </div>
+      </header>
+
+      {/* slide menu (mobile) */}
+      <aside className={`fixed inset-y-0 left-0 w-72 bg-slate-900 text-white transform ${menuOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform z-40`}> 
+        <div className="p-4 flex justify-between items-center">
+          <h3 className="font-bold">Menu</h3>
+          <button onClick={() => setMenuOpen(false)}>✕</button>
+        </div>
+        <nav className="px-4">
+          <ul className="space-y-4 text-lg font-semibold">
+            <li>Home</li>
+            <li>Music</li>
+            <li>Entertainment</li>
+            <li>Video</li>
+            <li>Contact Us</li>
+          </ul>
+        </nav>
+      </aside>
+
+      {/* page content */}
+      <main className="p-4 md:p-8">
+        {/* hero */}
+        <section className="mb-6">
+          <div className="bg-white rounded overflow-hidden shadow-md">
+            <img src="https://picsum.photos/seed/hero/1200/600" alt="hero" className="w-full object-cover h-56 md:h-96" />
+          </div>
+        </section>
+
+        {/* trending */}
+        <section>
+          <h2 className="text-2xl font-bold text-sky-600 mb-4">TRENDING SONGS</h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {sampleCards.map((c, i) => (
+              <Card key={i} title={c.title} img={c.img} />
+            ))}
+          </div>
+        </section>
+      </main>
+
+      {/* floating music streaming banner */}
+      <div className="fixed left-6 right-6 bottom-20 md:bottom-8 z-30">
+        <div className="mx-auto max-w-xl bg-white rounded-full shadow-lg px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded bg-slate-200 flex items-center justify-center">⚡</div>
+            <div className="text-slate-800 font-medium">Music streaming service</div>
+          </div>
+          <button className="text-blue-600 font-semibold">Open</button>
+        </div>
+      </div>
+
+      {/* WhatsApp floating button */}
+      <a className="fixed right-4 bottom-4 z-40" href="https://wa.me/231000000000" target="_blank" rel="noreferrer">
+        <div className="w-14 h-14 rounded-full bg-green-500 flex items-center justify-center shadow-lg text-white font-bold">✆</div>
+      </a>
+
+      {/* bottom nav for mobile mimic */}
+      <nav className="fixed bottom-0 left-0 right-0 bg-slate-900 text-white p-3 md:hidden">
+        <div className="flex justify-around">
+          <div>≡</div>
+          <div>◯</div>
+          <div>↺</div>
+        </div>
+      </nav>
+    </div>
+  )
+}
+
+
+---
+
+src/styles.css
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body, #root { height: 100%; }
+
+/* small helper for tag shadows */
+.shadow-sm { box-shadow: 0 1px 2px rgba(0,0,0,0.08); }
+
+> Add tailwind.config.cjs (basic):
+
+
+
+module.exports = {
+  content: ["./index.html", "./src/**/*.{js,jsx,ts,tsx}"],
+  theme: { extend: {} },
+  plugins: [],
+}
+
+
+---
+
+.github/workflows/deploy.yml
+
+name: Build and Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install
+        run: npm ci
+      - name: Build
+        run: npm run build
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+
+
+---
+
+Customization tips
+
+Replace picsum.photos placeholders with real album art in src/App.jsx or make a JSON data file and fetch it.
+
+Swap logo at /logo192.png with your brand image.
+
+Add real categories/tags and route with React Router when you want multiple pages.
+
+To edit entirely inside GitHub: use the web editor (press . on a repo page) or create branches and PRs.
+
+
+
+---
+
+Need a plain HTML/CSS version?
+
+If you prefer a non-React static HTML version (single index.html + CSS, deployable to Pages without build), tell me and I will generate that instead.
+
+
+---
+
+End of scaffold
+
